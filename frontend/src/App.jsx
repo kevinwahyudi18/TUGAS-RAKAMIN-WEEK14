@@ -18,6 +18,7 @@ function App() {
           <Route path={"/newbook"} element={<NewBookPage />} />
           <Route path={"/books/:id"} element={<BookDetails />} />
           <Route path={"/editbook/:id"} element={<EditBookPage />} />
+          <Route path={"*"} element={<h1>PAGE NOT FOUND</h1>}/>
         </Routes>
       </Router>
     </VStack>

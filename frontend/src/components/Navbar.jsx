@@ -35,23 +35,27 @@ const Navbar = () => {
   }, [window.localStorage.getItem("token")]);
 
   return (
-    <Flex
-      w="full"
-      as="nav"
-      align="center"
-      justify="space-between"
-      wrap="wrap"
-      padding="1rem"
-      bg="teal.500"
-      color="white"
-    >
-      <Link to="/">
-        <Flex align="center" mr={5} cursor="pointer">
-          <Text fontSize="xl" fontWeight="bold">
-            My Website
-          </Text>
-        </Flex>
-      </Link>
+  <Flex
+  w="full"
+  as="nav"
+  align="center"
+  justify="space-between"
+  wrap="wrap"
+  padding="1rem"
+  bgGradient={[
+    'linear(to-tr, teal.300, yellow.400)',
+    'linear(to-t, blue.200, teal.500)',
+    'linear(to-b, orange.100, purple.300)',
+  ]}
+  color="white" // Ganti dengan warna teks yang Anda inginkan
+  >
+<Link to="/">
+  <Flex align="center" mr={5} cursor="pointer">
+    <Text fontSize="2xl" fontWeight="bold"> {/* Ganti nilai "2xl" sesuai dengan preferensi Anda */}
+      My Website
+    </Text>
+  </Flex>
+</Link>
       <HStack>
         {isLogin && (
           <Link to="/newbook">
