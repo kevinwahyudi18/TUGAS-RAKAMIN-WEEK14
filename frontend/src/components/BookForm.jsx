@@ -87,59 +87,60 @@ export default function BookForm({ bookData }) {
   return (
     <form onSubmit={handleSubmit}>
       <VStack spacing={4}>
-      <Box
-      boxShadow="md"
-      p={4}
-      borderRadius="md"
-      bgGradient={[
-    'linear(to-tr, teal.300, yellow.400)',
-    'linear(to-t, blue.200, teal.500)',
-    'linear(to-b, orange.100, purple.300)',
-  ]}
-      >
-        <FormControl>
-          <FormLabel textAlign="center">Title</FormLabel>
-          <Input border="1px solid black" name="title" required defaultValue={bookData?.title} />
-        </FormControl>
-        <FormControl>
-          <FormLabel textAlign="center">Author</FormLabel>
-          <Input border="1px solid black" name="author" required defaultValue={bookData?.author} />
-        </FormControl>
-        <FormControl>
-          <FormLabel textAlign="center">Publisher</FormLabel>
-          <Input border="1px solid black" name="publisher" required defaultValue={bookData?.publisher} />
-        </FormControl>
-        <FormControl>
-          <FormLabel textAlign="center">Year</FormLabel>
-          <Input border="1px solid black" name="year" type="number" required defaultValue={bookData?.year} />
-        </FormControl>
-        <FormControl>
-          <FormLabel textAlign="center">Pages</FormLabel>
-          <Input border="1px solid black" name="pages" type="number" required defaultValue={bookData?.pages}
-          />
-        </FormControl>
-        <Center>
-          {selectedImage && (
-          <Image w={64} src={selectedImage} alt="Selected Image" mx="auto" my={4}/>
-          )}
-          </Center>
-        {!bookData?.image && (
+        <Box
+          boxShadow="md"
+          p={4}
+          borderRadius="md"
+          bgGradient={[
+            'linear(to-tr, teal.300, yellow.400)',
+            'linear(to-t, blue.200, teal.500)',
+            'linear(to-b, orange.100, purple.300)',
+          ]}
+        >
           <FormControl>
-            <FormLabel textAlign="center">Image</FormLabel>
-            <Input border="1px solid black"
-              name="image"
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files[0];
-                setSelectedImage(URL.createObjectURL(file));
-              }}
-            />
+            <FormLabel textAlign="center">Title</FormLabel>
+            <Input border="1px solid black" name="title" required defaultValue={bookData?.title} />
           </FormControl>
-        )}
+          <FormControl>
+            <FormLabel textAlign="center">Author</FormLabel>
+            <Input border="1px solid black" name="author" required defaultValue={bookData?.author} />
+          </FormControl>
+          <FormControl>
+            <FormLabel textAlign="center">Publisher</FormLabel>
+            <Input border="1px solid black" name="publisher" required defaultValue={bookData?.publisher} />
+          </FormControl>
+          <FormControl>
+            <FormLabel textAlign="center">Year</FormLabel>
+            <Input border="1px solid black" name="year" type="number" required defaultValue={bookData?.year} />
+          </FormControl>
+          <FormControl>
+            <FormLabel textAlign="center">Pages</FormLabel>
+            <Input border="1px solid black" name="pages" type="number" required defaultValue={bookData?.pages} />
+          </FormControl>
+          <Center>
+            {selectedImage && (
+              <Image w={64} src={selectedImage} alt="Selected Image" mx="auto" my={4} />
+            )}
+          </Center>
+          {!bookData?.image && (
+            <FormControl>
+              <FormLabel textAlign="center">Image</FormLabel>
+              <Input
+                border="1px solid black"
+                name="image"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  setSelectedImage(URL.createObjectURL(file));
+                }}
+              />
+            </FormControl>
+          )}
         </Box>
         <Button type="submit">{bookData ? "Edit Book" : "Create Book"}</Button>
       </VStack>
     </form>
   );
 }
+

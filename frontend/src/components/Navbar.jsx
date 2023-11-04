@@ -47,11 +47,11 @@ const Navbar = () => {
     'linear(to-t, blue.200, teal.500)',
     'linear(to-b, orange.100, purple.300)',
   ]}
-  color="white" // Ganti dengan warna teks yang Anda inginkan
+  color="white" 
   >
 <Link to="/">
   <Flex align="center" mr={5} cursor="pointer">
-    <Text fontSize="2xl" fontWeight="bold"> {/* Ganti nilai "2xl" sesuai dengan preferensi Anda */}
+    <Text fontSize="2xl" fontWeight="bold"> 
       My Website
     </Text>
   </Flex>
