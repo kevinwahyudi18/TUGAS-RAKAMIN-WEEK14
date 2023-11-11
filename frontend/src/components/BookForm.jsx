@@ -2,7 +2,6 @@ import {
   Button,
   FormControl,
   FormLabel,
-  Image,
   Input,
   useToast,
   VStack,
@@ -10,67 +9,47 @@ import {
   Center
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import Image from 'next/image';
 import { createBook, editBook } from "../modules/fetch";
 
 export default function BookForm({ bookData }) {
   const toast = useToast();
   const [selectedImage, setSelectedImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (!selectedImage) {
-      toast({
-        title: "Error",
-        description: "Please select image",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
+    
+    // Create a FormData object to send the file
+    const formData = new FormData();
+    formData.append('title', event.target.title.value);
+    formData.append('author', event.target.author.value);
+    formData.append('publisher', event.target.publisher.value);
+    formData.append('year', parseInt(event.target.year.value));
+    formData.append('pages', parseInt(event.target.pages.value));
+    if (imageFile) {
+      formData.append('image', imageFile);
     }
-    const formData = new FormData(event.target);
-    if (bookData) {
-      try {
-        await editBook(
-          bookData.id,
-          formData.get("title"),
-          formData.get("author"),
-          formData.get("publisher"),
-          parseInt(formData.get("year")),
-          parseInt(formData.get("pages"))
-        );
-        toast({
-          title: "Success",
-          description: "Book edited successfully",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: error.response.data.message || "Something went wrong",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-      return;
-    }
+
+    // Determine if we're creating or editing a book
+    const action = bookData ? editBook : createBook;
+
     try {
-      await createBook(formData);
+      await action(bookData?.id, formData);
       event.target.reset();
+      setSelectedImage(null);
+      setImageFile(null);
       toast({
         title: "Success",
-        description: "Book created successfully",
+        description: `Book ${bookData ? 'edited' : 'created'} successfully`,
         status: "success",
         duration: 5000,
         isClosable: true,
       });
-      setSelectedImage("");
     } catch (error) {
       toast({
         title: "Error",
-        description: error.response.data.message || "Something went wrong",
+        description: error.response?.data.message || "Something went wrong",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -83,6 +62,14 @@ export default function BookForm({ bookData }) {
       setSelectedImage(`http://localhost:8000/${bookData?.image}`);
     }
   }, [bookData]);
+
+  function handleImageChange(event) {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedImage(URL.createObjectURL(file));
+      setImageFile(file); // Store the file to send on submit
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -97,29 +84,17 @@ export default function BookForm({ bookData }) {
             'linear(to-b, orange.100, purple.300)',
           ]}
         >
-          <FormControl>
-            <FormLabel textAlign="center">Title</FormLabel>
-            <Input border="1px solid black" name="title" required defaultValue={bookData?.title} />
-          </FormControl>
-          <FormControl>
-            <FormLabel textAlign="center">Author</FormLabel>
-            <Input border="1px solid black" name="author" required defaultValue={bookData?.author} />
-          </FormControl>
-          <FormControl>
-            <FormLabel textAlign="center">Publisher</FormLabel>
-            <Input border="1px solid black" name="publisher" required defaultValue={bookData?.publisher} />
-          </FormControl>
-          <FormControl>
-            <FormLabel textAlign="center">Year</FormLabel>
-            <Input border="1px solid black" name="year" type="number" required defaultValue={bookData?.year} />
-          </FormControl>
-          <FormControl>
-            <FormLabel textAlign="center">Pages</FormLabel>
-            <Input border="1px solid black" name="pages" type="number" required defaultValue={bookData?.pages} />
-          </FormControl>
+          {/* ... all your FormControls ... */}
           <Center>
             {selectedImage && (
-              <Image w={64} src={selectedImage} alt="Selected Image" mx="auto" my={4} />
+              <Box w={64} mx="auto" my={4} pos="relative" height="150px">
+                <Image
+                  src={selectedImage}
+                  alt="Selected Image"
+                  layout="fill"
+                  objectFit="cover"
+                />
+              </Box>
             )}
           </Center>
           {!bookData?.image && (
@@ -130,10 +105,7 @@ export default function BookForm({ bookData }) {
                 name="image"
                 type="file"
                 accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  setSelectedImage(URL.createObjectURL(file));
-                }}
+                onChange={handleImageChange}
               />
             </FormControl>
           )}
@@ -143,4 +115,3 @@ export default function BookForm({ bookData }) {
     </form>
   );
 }
-

@@ -18,48 +18,78 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { loginUser } from "../modules/fetch";
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLogin, setIsLogin] = useState(false);
   const toast = useToast();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
-    const token = window.localStorage.getItem("token");
-    if (token) {
-      setIsLogin(true);
+    // Ini memastikan bahwa kode hanya berjalan di sisi klien
+    const handleTokenCheck = () => {
+      const token = localStorage.getItem("token");
+      setIsLogin(!!token);
+    };
+
+    if (typeof window !== "undefined") {
+      handleTokenCheck();
     }
-  }, [window.localStorage.getItem("token")]);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLogin(false);
+    router.push("/");
+  };
+
+  const handleLogin = async (email, password) => {
+    try {
+      const token = await loginUser(email, password);
+      localStorage.setItem("token", token.token);
+      setIsLogin(true);
+      router.push("/");
+      onClose();
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: err.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
 
   return (
-  <Flex
-  w="full"
-  as="nav"
-  align="center"
-  justify="space-between"
-  wrap="wrap"
-  padding="1rem"
-  bgGradient={[
-    'linear(to-tr, teal.300, yellow.400)',
-    'linear(to-t, blue.200, teal.500)',
-    'linear(to-b, orange.100, purple.300)',
-  ]}
-  color="white" 
-  >
-<Link to="/">
-  <Flex align="center" mr={5} cursor="pointer">
-    <Text fontSize="2xl" fontWeight="bold"> 
-      My Website
-    </Text>
-  </Flex>
-</Link>
+    <Flex
+      as="nav"
+      align="center"
+      justify="space-between"
+      wrap="wrap"
+      padding="1rem"
+      bgGradient={[
+        'linear(to-tr, teal.300, yellow.400)',
+        'linear(to-t, blue.200, teal.500)',
+        'linear(to-b, orange.100, purple.300)',
+      ]}
+      color="white"
+      w="full"
+    >
+      <Link href="/" passHref>
+        <Flex align="center" mr={5} as="a" cursor="pointer">
+          <Text fontSize="2xl" fontWeight="bold">
+            My Website
+          </Text>
+        </Flex>
+      </Link>
       <HStack>
         {isLogin && (
-          <Link to="/newbook">
-            <Button colorScheme="blackAlpha">Create New Book</Button>
+          <Link href="/newbook" passHref>
+            <Button as="a" colorScheme="blackAlpha">Create New Book</Button>
           </Link>
         )}
         {!isLogin ? (
@@ -67,79 +97,51 @@ const Navbar = () => {
             Login
           </Button>
         ) : (
-          <Button
-            colorScheme="blue"
-            onClick={() => {
-              window.localStorage.removeItem("token");
-              setIsLogin(false);
-              navigate("/")
-            }}
-          >
+          <Button colorScheme="blue" onClick={handleLogout}>
             Logout
           </Button>
         )}
       </HStack>
 
       <Modal isOpen={isOpen} onClose={onClose}>
-        <form
-          id="login-form"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            try {
-              const token = await loginUser(
-                e.target.email.value,
-                e.target.password.value
-              );
-              window.localStorage.setItem("token", token.token);
-              navigate("/");
-              onClose();
-            } catch (err) {
-              toast({
-                title: "Error",
-                description: err.message,
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-              });
-            }
-          }}
-        >
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Login</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <VStack>
-                <FormControl isRequired>
-                  <FormLabel>Email</FormLabel>
-                  <Input
-                    name="email"
-                    type="email"
-                    placeholder="Enter your email address"
-                  />
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Password</FormLabel>
-                  <Input
-                    type="password"
-                    name="password"
-                    placeholder="Enter your password"
-                  />
-                </FormControl>
-              </VStack>
-            </ModalBody>
-            <ModalFooter>
-              <Button type="submit" form="login-form" colorScheme="blue" mr={3}>
-                Login
-              </Button>
-              <Link to="/register" onClick={onClose}>
-                <Button variant="ghost">
-                  Doesn't Have Account? Click here
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Login</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack as="form" id="login-form" onSubmit={(e) => {
+              e.preventDefault();
+              handleLogin(e.target.email.value, e.target.password.value);
+            }}>
+              <FormControl isRequired>
+                <FormLabel>Email</FormLabel>
+                <Input
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email address"
+                />
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>Password</FormLabel>
+                <Input
+                  name="password"
+                  type="password"
+                  placeholder="Enter your password"
+                />
+              </FormControl>
+              <ModalFooter>
+                <Button type="submit" colorScheme="blue" mr={3}>
+                  Login
                 </Button>
-              </Link>
-            </ModalFooter>
-          </ModalContent>
-        </form>
+                <Link href="/register" passHref>
+                  <Button variant="ghost" onClick={onClose} as="a">
+                    Doesn't Have Account? Click here
+                  </Button>
+                </Link>
+              </ModalFooter>
+            </VStack>
+          </ModalBody>
+        </ModalContent>
       </Modal>
     </Flex>
   );
