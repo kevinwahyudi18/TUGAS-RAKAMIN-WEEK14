@@ -1,9 +1,0 @@
-{
-    "development":{
-        "username":"postgres",
-        "password":"181217",
-        "database":"homework_akhir",
-        "host":"localhost",
-        "dialect":"postgres"
-    }
-}
