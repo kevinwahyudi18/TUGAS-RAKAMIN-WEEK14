@@ -1,0 +1,9 @@
+{
+    "development":{
+        "username":"postgres",
+        "password":"181217",
+        "database":"rakamin_next_js",
+        "host":"localhost",
+        "dialect":"postgres"
+    }
+}
